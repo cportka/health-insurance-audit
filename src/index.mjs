@@ -13,7 +13,7 @@ export {
   hasWeakerRights,
 } from "./planTypes.mjs";
 
-export { buildPathway } from "./navigator.mjs";
+export { buildPathway, DENIAL_TYPES } from "./navigator.mjs";
 export { PATHWAYS } from "./data/pathways.mjs";
 
 export { generateLetter, listLetterTypes } from "./letters.mjs";

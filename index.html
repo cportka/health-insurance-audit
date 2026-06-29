@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Health Insurance Audit &amp; Grievance Filer</title>
+    <meta
+      name="description"
+      content="Free, private tool to audit your US health insurance, find your appeal deadlines, write appeal & grievance letters, and check your bill — for all major plan types. Not legal advice."
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+    <link rel="stylesheet" href="./web/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="wrap">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">🛡️</span>
+          <div>
+            <h1>Health Insurance Audit &amp; Grievance Filer</h1>
+            <p class="tagline">Push back on a denial or a wrong bill — for free, and privately.</p>
+          </div>
+        </div>
+        <p class="privacy-pill" title="Everything runs in your browser. Nothing you type is sent anywhere.">
+          🔒 Runs entirely in your browser — nothing is uploaded
+        </p>
+      </div>
+    </header>
+
+    <div class="disclaimer-bar" role="note">
+      <div class="wrap">
+        <strong>This is general information, not legal or medical advice.</strong>
+        Always confirm the deadline on your own denial notice. <strong>When in doubt, file early.</strong>
+      </div>
+    </div>
+
+    <nav class="tabs wrap" role="tablist" aria-label="Sections">
+      <button role="tab" class="tab" data-tab="start" aria-selected="true">1 · Start</button>
+      <button role="tab" class="tab" data-tab="deadlines" aria-selected="false">2 · Deadlines</button>
+      <button role="tab" class="tab" data-tab="audit" aria-selected="false">3 · Audit a bill</button>
+      <button role="tab" class="tab" data-tab="letters" aria-selected="false">4 · Letters</button>
+      <button role="tab" class="tab" data-tab="documents" aria-selected="false">5 · Documents</button>
+    </nav>
+
+    <main id="main" class="wrap">
+      <!-- START -->
+      <section id="panel-start" class="panel" role="tabpanel" aria-label="Start">
+        <h2>What kind of health plan do you have?</h2>
+        <p class="muted">
+          This decides who you appeal to and how long you have. If you're not sure, describe it below
+          and we'll guess.
+        </p>
+
+        <label class="field">
+          <span>Pick your plan type</span>
+          <select id="plan-select">
+            <option value="">— choose —</option>
+          </select>
+        </label>
+
+        <details class="not-sure">
+          <summary>Not sure what you have?</summary>
+          <label class="field">
+            <span>Describe your coverage in your own words</span>
+            <input id="plan-guess-input" type="text" placeholder="e.g. through my job, a big company that pays the claims itself" />
+          </label>
+          <button id="plan-guess-btn" class="btn">Guess my plan type</button>
+          <div id="plan-guess-results" class="guess-results"></div>
+        </details>
+
+        <div id="plan-info" class="plan-info" hidden></div>
+
+        <div class="next-hint" id="start-next" hidden>
+          <button class="btn primary" data-goto="deadlines">Next: find my deadlines →</button>
+        </div>
+      </section>
+
+      <!-- DEADLINES -->
+      <section id="panel-deadlines" class="panel" role="tabpanel" aria-label="Deadlines" hidden>
+        <h2>Your appeal deadlines &amp; pathway</h2>
+        <p class="muted" id="deadlines-plan-label">Pick your plan type on the Start tab first.</p>
+
+        <div class="row">
+          <label class="field">
+            <span>What kind of denial?</span>
+            <select id="denial-type"></select>
+          </label>
+          <label class="field">
+            <span>Date on your denial notice</span>
+            <input id="denial-date" type="date" />
+          </label>
+        </div>
+        <button id="navigate-btn" class="btn primary">Show my deadlines</button>
+
+        <div id="navigate-results" class="results"></div>
+      </section>
+
+      <!-- AUDIT -->
+      <section id="panel-audit" class="panel" role="tabpanel" aria-label="Audit a bill" hidden>
+        <h2>Audit a bill or EOB</h2>
+        <p class="muted">
+          Enter the lines from your Explanation of Benefits (EOB) or itemized bill. We'll flag charges
+          you may not actually owe. <button id="audit-example" class="linkbtn">Load an example</button>
+        </p>
+
+        <fieldset class="claim-meta">
+          <legend>About this claim</legend>
+          <label class="inline">
+            <span>Provider was</span>
+            <select id="provider-network">
+              <option value="">unknown</option>
+              <option value="true">in-network</option>
+              <option value="false">out-of-network</option>
+            </select>
+          </label>
+          <label class="inline checkbox">
+            <input type="checkbox" id="is-emergency" /> <span>This was emergency care</span>
+          </label>
+        </fieldset>
+
+        <div id="audit-lines"></div>
+        <button id="add-line" class="btn">+ Add a line</button>
+
+        <details class="advanced">
+          <summary>Advanced: paste EOB as JSON</summary>
+          <textarea id="audit-json" rows="6" placeholder='{"provider":{"inNetwork":true},"lines":[...]}'></textarea>
+        </details>
+
+        <button id="audit-btn" class="btn primary">Audit this bill</button>
+        <div id="audit-results" class="results"></div>
+      </section>
+
+      <!-- LETTERS -->
+      <section id="panel-letters" class="panel" role="tabpanel" aria-label="Letters" hidden>
+        <h2>Write an appeal or grievance letter</h2>
+        <label class="field">
+          <span>What do you need to write?</span>
+          <select id="letter-type"></select>
+        </label>
+
+        <div class="row">
+          <label class="field"><span>Your full name</span><input data-ctx="memberName" type="text" /></label>
+          <label class="field"><span>Health plan name</span><input data-ctx="planName" type="text" /></label>
+          <label class="field"><span>Member / ID #</span><input data-ctx="memberId" type="text" /></label>
+          <label class="field"><span>Claim #</span><input data-ctx="claimNumber" type="text" /></label>
+          <label class="field"><span>Patient name</span><input data-ctx="patientName" type="text" /></label>
+          <label class="field"><span>Date(s) of service</span><input data-ctx="serviceDate" type="text" placeholder="e.g. 2026-05-12" /></label>
+          <label class="field"><span>Reason they gave for the denial</span><input data-ctx="denialReason" type="text" /></label>
+          <label class="field"><span>Drug name (Part D only)</span><input data-ctx="drugName" type="text" /></label>
+        </div>
+        <label class="field">
+          <span>Your explanation / argument (why they should cover it)</span>
+          <textarea data-ctx="argument" rows="3"></textarea>
+        </label>
+
+        <button id="letter-btn" class="btn primary">Generate my letter</button>
+        <div id="letter-results" class="results"></div>
+      </section>
+
+      <!-- DOCUMENTS -->
+      <section id="panel-documents" class="panel" role="tabpanel" aria-label="Documents" hidden>
+        <h2>What documents do I need?</h2>
+        <label class="field">
+          <span>What's your situation?</span>
+          <select id="scenario-select"></select>
+        </label>
+        <button id="checklist-btn" class="btn primary">Build my checklist</button>
+        <div id="checklist-results" class="results"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p id="full-disclaimer"></p>
+        <p class="links">
+          Free help: your State Insurance Department · SHIP (Medicare) · US DOL/EBSA 1-866-444-3272 ·
+          No Surprises Help Desk 1-800-985-3059
+        </p>
+        <p class="meta">
+          Open source (<a href="https://github.com/cportka/health-insurance-audit">MIT</a>) ·
+          <span id="version-note"></span> · This site stores nothing and uploads nothing.
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./web/app.js"></script>
+  </body>
+</html>
