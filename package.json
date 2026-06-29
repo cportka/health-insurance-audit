@@ -1,6 +1,6 @@
 {
   "name": "health-insurance-audit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Free, offline-first tool that helps US patients audit their health insurance claims and EOBs, find the right appeal/grievance pathway and deadlines, and generate appeal & grievance letters — across all major US plan types.",
   "type": "module",
   "bin": {

@@ -62,13 +62,15 @@ auto-runs the audit.
 
 ---
 
-## Gate 3 — Web app (no install) ⏳ `0.4.0`
+## Gate 3 — Web app (no install) 🔨 in progress — static MVP shipped in `0.3.0`
 
-Most people won't use a CLI. Ship a simple, accessible web UI over the same engine — mobile-first,
-works on a phone. (Deployable to Vercel; the engine stays the source of truth.)
+Most people won't use a CLI. A **static, client-side MVP shipped early** (`0.3.0`, on GitHub Pages)
+so feedback can start now: all four pillars + plan picker, mobile-first, importing the same engine in
+the browser, with nothing uploaded. Still ahead for this gate: the guided interview (Gate 1)
+integrated into the UI, a full accessibility (WCAG) audit, document OCR (Gate 2), and print/download.
 
-- **Deliverables:** web front-end for all four pillars + the guided interview; accessibility (WCAG)
-  pass; mobile layout; print/download letters and checklists.
+- **Deliverables:** ✅ static web front-end for all four pillars (`index.html` + `web/`); ⏳ guided
+  interview in the UI; ⏳ accessibility (WCAG) pass; ⏳ print/download letters and checklists.
 - **Test & throw:** can a non-technical relative use it on their phone, start to finish?
 - **Exit criteria:** task completion by novices on mobile; accessibility audit passes.
 - **Decisions:** Hosting + privacy posture (local-only mode vs. hosted); branding; domain.

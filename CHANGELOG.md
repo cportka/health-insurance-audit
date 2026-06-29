@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com) and the project uses
 [Semantic Versioning](https://semver.org).
 
+## [0.3.0] — 2026-06-29
+
+First **web front end** — a static, single-page site so non-technical users can start giving
+feedback (an early preview of the Gate 3 web app, shipped ahead of schedule).
+
+### Added
+- **Static web app** (`index.html`, `web/app.js`, `web/styles.css`) that imports the dependency-free
+  library directly in the browser (the same engine the CLI uses — no bundler, no build step). It is
+  **100% client-side**: nothing is uploaded, matching the no-PHI-leaves-the-device promise. Five
+  sections: pick/guess your plan type, deadline & pathway navigator (with overturn odds), bill/EOB
+  audit (guided line-item form + "load an example" + JSON paste), letter generator (with copy), and
+  the document checklist. Mobile-first, accessible, with the disclaimer always visible.
+- **GitHub Pages**: `.nojekyll` so the `src/` and `web/` files are served as-is; the site deploys
+  from `main`.
+- `DENIAL_TYPES` is now part of the public API (`src/index.mjs`) for the UI.
+- `tests/web.test.mjs` — guards the published files' wiring and the public-API contract the browser
+  depends on (dependency-free; full click-through verified separately with a headless browser).
+
+### Notes
+- Verified end to end in a real headless browser: all five sections work with no console errors, and
+  `.mjs` modules are served with the correct `text/javascript` MIME type on static hosts.
+
 ## [0.2.0] — 2026-06-29
 
 Gate 0 hardening from a multi-source research pass with adversarial deadline verification (CMS,

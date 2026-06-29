@@ -4,7 +4,7 @@ A free, offline-first tool that helps patients in the USA **audit their health i
 **right appeal/grievance pathway and deadlines**, generate **appeal & grievance letters**, and know
 **exactly which documents to gather** — across all major US plan types.
 
-> **Version:** 0.2.0 · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
+> **Version:** 0.3.0 · **Try it:** [cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/) · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
 
 > ⚠️ **This is general information, not legal or medical advice.** Deadlines and rights vary by plan,
 > state, and situation. Always confirm the deadline on your own denial notice and with your plan or
@@ -41,7 +41,15 @@ All **major US plan types** are modeled: ACA individual/marketplace, fully-insur
 managed care and fee-for-service, FEHB, TRICARE, COBRA, short-term, and student plans — with a
 warning when a plan type has **weaker appeal rights**.
 
-## Quick start
+## Use it in your browser (no install)
+
+A static web app lives at **[cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/)**
+— pick your plan, see your deadlines and overturn odds, audit a bill, draft a letter, and get your
+document checklist. It runs **100% in your browser** (it imports this same library as ES modules), so
+**nothing you type is uploaded**. To run it locally, serve the repo root with any static server
+(`python3 -m http.server`) and open `index.html`.
+
+## Quick start (CLI)
 
 No dependencies. Requires Node.js ≥ 18.
 
