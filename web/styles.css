@@ -107,15 +107,35 @@ textarea { resize: vertical; }
 .odds strong { color: var(--ok); }
 .odds .src { font-size: 0.8rem; }
 
-.nextaction {
-  background: #eef4ff; border: 1px solid #d4e3ff; border-left: 4px solid var(--brand);
-  padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 600;
+/* Hero: the one thing to do next. */
+.hero {
+  background: linear-gradient(180deg, #1f6feb, #0b3d91); color: #fff;
+  border-radius: 12px; padding: 1.1rem 1.2rem; margin-bottom: 1rem; box-shadow: var(--shadow);
 }
+.hero-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.9; }
+.hero-step { font-size: 1.25rem; font-weight: 800; margin: 0.15rem 0 0.2rem; }
+.hero-deadline { font-size: 1rem; }
+.hero-deadline strong { background: rgba(255, 255, 255, 0.18); padding: 0.05rem 0.4rem; border-radius: 6px; }
 
-.step { border: 1px solid var(--line); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.6rem; }
-.step h3 { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
-.step .who { font-weight: 500; color: var(--muted); font-size: 0.85rem; }
-.step ul { margin: 0.4rem 0 0; padding-left: 1.1rem; font-size: 0.92rem; }
+/* Progressive-disclosure "More details" block. */
+.more { margin-top: 0.45rem; }
+.more > summary {
+  cursor: pointer; color: var(--brand-ink); font-weight: 600; font-size: 0.84rem;
+  list-style: none; display: inline-flex; align-items: center; gap: 0.3rem;
+}
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary::after { content: "▾"; font-size: 0.7rem; }
+.more[open] > summary::after { content: "▴"; }
+.more-body { margin-top: 0.5rem; }
+.more-body ul { margin: 0; padding-left: 1.1rem; font-size: 0.92rem; }
+
+/* One-line steps. */
+.steps-block { margin-top: 0.4rem; }
+.steps-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0.4rem 0; }
+.step-row { border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.9rem; margin-bottom: 0.45rem; }
+.step-line { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; }
+.step-title { font-weight: 700; }
+.step-when { color: var(--ink); font-size: 0.9rem; white-space: nowrap; }
 .pill { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.12rem 0.5rem; border-radius: 999px; }
 .pill.ok { background: #e8f6ee; color: var(--ok); }
 .pill.urgent { background: var(--med-bg); color: var(--warn); }

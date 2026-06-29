@@ -4,7 +4,7 @@ A free, offline-first tool that helps patients in the USA **audit their health i
 **right appeal/grievance pathway and deadlines**, generate **appeal & grievance letters**, and know
 **exactly which documents to gather** — across all major US plan types.
 
-> **Version:** 0.3.0 · **Try it:** [cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/) · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
+> **Version:** 0.3.1 · **Try it:** [cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/) · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
 
 > ⚠️ **This is general information, not legal or medical advice.** Deadlines and rights vary by plan,
 > state, and situation. Always confirm the deadline on your own denial notice and with your plan or

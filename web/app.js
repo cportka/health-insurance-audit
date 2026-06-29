@@ -22,6 +22,11 @@ const srcLinks = (sources = []) =>
   sources.length
     ? `<p class="src">${sources.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">source ↗</a>`).join("")}</p>`
     : "";
+// Progressive disclosure: a collapsed "More details" block. Simple by default, deep on demand.
+const more = (label, innerHTML) =>
+  innerHTML && innerHTML.trim()
+    ? `<details class="more"><summary>${esc(label)}</summary><div class="more-body">${innerHTML}</div></details>`
+    : "";
 
 const state = { planTypeId: "" };
 
@@ -125,10 +130,9 @@ function onPlanChange(e) {
   box.classList.toggle("weaker", !!p.weakerRights);
   box.innerHTML = `
     <h3>${esc(p.name)}</h3>
-    <p>${esc(p.notes || "")}</p>
     <p><strong>Who oversees appeals:</strong> ${esc(p.regulator)}</p>
     ${p.weakerRights ? `<p>⚠ <strong>Heads up:</strong> these plans often have weaker appeal protections — confirm your exact rights in your policy.</p>` : ""}
-    <p class="muted"><em>How to tell:</em> ${esc(p.howToIdentify || "")}</p>`;
+    ${more("More about this plan", `<p>${esc(p.notes || "")}</p><p class="muted"><em>How to tell if this is you:</em> ${esc(p.howToIdentify || "")}</p>`)}`;
   $("#start-next").hidden = false;
   refreshPlanLabels();
 }
@@ -172,31 +176,48 @@ function onNavigate() {
     denialType: $("#denial-type").value,
     denialDate: $("#denial-date").value || undefined,
   });
+  // Hero: the single most important thing — what to do next, and by when.
+  const hero = r.nextAction
+    ? `<div class="hero">
+         <div class="hero-label">✅ Your next step</div>
+         <div class="hero-step">${esc(r.nextAction.step)}</div>
+         <div class="hero-deadline">File by <strong>${esc(r.nextAction.fileBy)}</strong></div>
+       </div>`
+    : "";
+  // Odds: one motivating line; the detail + sources only if they want them.
   const odds = r.outcomeOdds
-    ? `<div class="odds"><strong>💪 ${esc(r.outcomeOdds.headline)}</strong><p>${esc(r.outcomeOdds.detail)}</p>${srcLinks(r.outcomeOdds.sources)}</div>`
+    ? `<div class="odds"><strong>💪 ${esc(r.outcomeOdds.headline)}</strong>${more("Why it's worth appealing", `<p>${esc(r.outcomeOdds.detail)}</p>${srcLinks(r.outcomeOdds.sources)}`)}</div>`
     : "";
-  const next = r.nextAction
-    ? `<div class="nextaction">➡ Next: ${esc(r.nextAction.step)} — file by ${esc(r.nextAction.fileBy)} <span class="muted">(decided by ${esc(r.nextAction.decidedBy)})</span></div>`
-    : "";
-  const steps = r.steps
-    .map((s) => {
-      const bits = [];
-      if (s.fileWithin) bits.push(`<li><strong>File within:</strong> ${esc(s.fileWithin)} of ${esc(s.fileFrom)}${s.fileByDate ? ` — by <strong>${esc(s.fileByDate)}</strong>${s.daysRemaining != null ? ` (${s.daysRemaining} days left)` : ""}` : ""}</li>`);
-      if (s.decisionWithin) bits.push(`<li><strong>They must decide within:</strong> ${esc(s.decisionWithin)}</li>`);
-      if (s.expedited) bits.push(`<li>${esc(s.expedited)}</li>`);
-      if (s.amountInControversy) bits.push(`<li><strong>Minimum amount in dispute:</strong> ${esc(s.amountInControversy)}</li>`);
-      if (s.authority) bits.push(`<li class="muted">Authority: ${esc(s.authority)}</li>`);
-      const badge = s.status ? `<span class="pill ${esc(s.status)}">${esc(s.status)}</span>` : "";
-      return `<div class="step"><h3><span>${s.order}. ${esc(s.name)} ${badge}</span></h3>
-        <div class="who">Decided by ${esc(s.decidedBy)}</div>
-        <ul>${bits.join("")}</ul>${srcLinks(s.sources)}</div>`;
-    })
-    .join("");
+  // Warnings stay visible — they're safety-critical.
   const warns = r.warnings.length
     ? `<div class="warnings">${r.warnings.map((w) => `<div class="warn-item">⚠ ${esc(w)}</div>`).join("")}</div>`
     : "";
-  const grievance = r.grievanceNote ? `<p class="muted"><em>${esc(r.grievanceNote)}</em></p>` : "";
-  box.innerHTML = `${odds}${next}${steps}${warns}${grievance}`;
+  // Each step is ONE line (name + its key deadline); everything else behind "More details".
+  const steps = r.steps
+    .map((s) => {
+      const lead = s.fileByDate
+        ? `by <strong>${esc(s.fileByDate)}</strong>${s.daysRemaining != null ? ` · ${s.daysRemaining} days left` : ""}`
+        : s.fileWithin
+          ? `within ${esc(s.fileWithin)}`
+          : s.decisionWithin
+            ? `decision in ${esc(s.decisionWithin)}`
+            : "";
+      const badge = s.status ? `<span class="pill ${esc(s.status)}">${esc(s.status)}</span>` : "";
+      const bits = [`<li>Decided by ${esc(s.decidedBy)}</li>`];
+      if (s.fileWithin) bits.push(`<li>File within ${esc(s.fileWithin)} of ${esc(s.fileFrom)}</li>`);
+      if (s.decisionWithin) bits.push(`<li>They must decide within ${esc(s.decisionWithin)}</li>`);
+      if (s.expedited) bits.push(`<li>${esc(s.expedited)}</li>`);
+      if (s.amountInControversy) bits.push(`<li>Minimum amount in dispute: ${esc(s.amountInControversy)}</li>`);
+      if (s.authority) bits.push(`<li class="muted">Authority: ${esc(s.authority)}</li>`);
+      return `<div class="step-row">
+          <div class="step-line"><span class="step-title">${s.order}. ${esc(s.name)} ${badge}</span><span class="step-when">${lead}</span></div>
+          ${more("More details", `<ul>${bits.join("")}</ul>${srcLinks(s.sources)}`)}
+        </div>`;
+    })
+    .join("");
+  const allSteps = `<div class="steps-block"><div class="steps-title">All ${r.steps.length} steps, in order</div>${steps}</div>`;
+  const grievance = r.grievanceNote ? more("When to use a grievance instead", `<p>${esc(r.grievanceNote)}</p>`) : "";
+  box.innerHTML = `${hero}${warns}${odds}${allSteps}${grievance}`;
 }
 
 // ---------- audit ----------
@@ -279,8 +300,8 @@ function onAudit() {
           (f) => `<div class="finding ${esc(f.severity)}">
             <span class="sev">${esc(f.severity)}</span>
             <h3>${esc(f.title)}${f.line ? ` <span class="muted">(line ${esc(f.line)})</span>` : ""}</h3>
-            <p>${esc(f.detail)}</p>
-            <p class="action">→ ${esc(f.suggestedAction)}</p>${srcLinks(f.sources)}</div>`,
+            <p class="action">→ ${esc(f.suggestedAction)}</p>
+            ${more("Why we flagged this", `<p>${esc(f.detail)}</p>${srcLinks(f.sources)}`)}</div>`,
         )
         .join("")
     : `<p class="empty-hint">No issues detected by the current checks. Still compare your EOB's "patient responsibility" against the bill.</p>`;
@@ -334,9 +355,9 @@ function onChecklist() {
   const r = buildChecklist({ scenario: $("#scenario-select").value, planTypeId: state.planTypeId || undefined });
   const item = (it) => `<div class="checklist-item">
       <input type="checkbox" aria-label="Have ${esc(it.name)}" />
-      <div><div><strong>${esc(it.name)}</strong> ${it.required ? '<span class="req-badge">REQUIRED</span>' : ""}</div>
-      <div class="why">${esc(it.why)}</div>
-      <div class="why"><em>How to get it:</em> ${esc(it.howToGet)}</div></div>
+      <div class="ci-main"><strong>${esc(it.name)}</strong> ${it.required ? '<span class="req-badge">REQUIRED</span>' : ""}
+        ${more("Why & how to get it", `<div class="why">${esc(it.why)}</div><div class="why"><em>How to get it:</em> ${esc(it.howToGet)}</div>`)}
+      </div>
     </div>`;
   const req = r.items.filter((i) => i.required);
   const help = r.items.filter((i) => !i.required);
