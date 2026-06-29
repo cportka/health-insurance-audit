@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com) and the project uses
 [Semantic Versioning](https://semver.org).
 
+## [0.3.1] — 2026-06-29
+
+UX: lead with one thing, hide the rest (progressive disclosure — "Apple-like" simplicity).
+
+### Changed
+- The deadlines view now opens with a single **"Your next step"** hero (the one action + its date),
+  one motivating odds line, and each appeal level collapsed to **one line + "More details"**
+  (decided-by, decision clock, expedited option, authority, and sources are now on-demand).
+- Bill-audit findings lead with the title + the one-line action; the explanation and sources move
+  behind "Why we flagged this".
+- Document-checklist items show just the name + REQUIRED badge; "why & how to get it" expands.
+- Plan info on Start shows the regulator + any weaker-rights warning; the rest expands.
+- No engine or API changes — purely how much is shown at once.
+
 ## [0.3.0] — 2026-06-29
 
 First **web front end** — a static, single-page site so non-technical users can start giving
