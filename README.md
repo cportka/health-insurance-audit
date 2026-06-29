@@ -4,7 +4,7 @@ A free, offline-first tool that helps patients in the USA **audit their health i
 **right appeal/grievance pathway and deadlines**, generate **appeal & grievance letters**, and know
 **exactly which documents to gather** — across all major US plan types.
 
-> **Version:** 0.1.0 · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
+> **Version:** 0.2.0 · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
 
 > ⚠️ **This is general information, not legal or medical advice.** Deadlines and rights vary by plan,
 > state, and situation. Always confirm the deadline on your own denial notice and with your plan or
@@ -12,18 +12,26 @@ A free, offline-first tool that helps patients in the USA **audit their health i
 
 ## Why this exists
 
-Roughly **1 in 5** in-network claims on ACA marketplace plans are denied, yet **less than 1%** of
-people ever appeal — and when they do, a large share of denials are overturned. Medicare Advantage
-prior-authorization denials are overturned on appeal the large majority of the time. Most people
-don't appeal because they don't know they can, don't know the deadline, and don't know what to say.
-This tool removes those three barriers, and audits the bill/EOB for the billing errors that quietly
-cost patients money.
+The leverage here is enormous, and it's measured:
+
+- ACA marketplace insurers denied **~19% of in-network claims in 2024** (~85M claims), yet consumers
+  appealed **fewer than 1%** of them ([KFF](https://www.kff.org/patient-consumer-protections/claims-denials-and-appeals-in-aca-marketplace-plans-in-2024/)).
+- **~69%** of people with a denied claim **don't know they can appeal** ([KFF](https://www.kff.org/affordable-care-act/consumer-survey-highlights-problems-with-denied-health-insurance-claims/)).
+- When people do appeal, they win meaningfully often: roughly **1 in 3** ACA internal appeals are
+  overturned, external review overturns **~30–78%**, and Medicare Advantage plans overturn about
+  **75% of prior-auth denials** (and ~95% of skilled-nursing denials) on appeal ([HHS-OIG](https://oig.hhs.gov/reports/all/2018/medicare-advantage-appeal-outcomes-and-audit-findings-raise-concerns-about-service-and-payment-denials/)).
+- Separately, an estimated **~80% of medical bills contain an error** and **~86% of denials are
+  "potentially avoidable"** (administrative/coding) — money recoverable without even appealing.
+
+People don't push back because they don't know they can, don't know the deadline, and don't know what
+to say. This tool removes those three barriers — and surfaces the overturn odds for *your* plan right
+when you get denied — then audits the bill/EOB for the errors that quietly cost patients money.
 
 ## What it does (v0.1 — the core engine)
 
 | Capability | Command | What you get |
 | :-- | :-- | :-- |
-| **Deadline & pathway navigator** | `hia navigate` | Your ordered appeal/grievance steps, each with its filing deadline (computed from your denial date), who decides it, how long they have, and the governing law. |
+| **Deadline & pathway navigator** | `hia navigate` | Your ordered appeal/grievance steps, each with its filing deadline (computed from your denial date), who decides it, how long they have, the governing law — **and how often this kind of denial gets overturned**, to tell you it's worth it. |
 | **Appeal & grievance letters** | `hia letter` | Ready-to-send, mail-merged letters (internal appeal, external review, grievance, claim-file request, balance-bill dispute, No Surprises Act, Part D exception) with the right statutory language. |
 | **Bill & EOB audit** | `hia audit` | A rules engine that flags likely errors — balance billing, contractual write-offs billed to you, $0-preventive charged cost-share, surprise out-of-network bills, timely-filing denials, duplicates, COB, math errors. |
 | **Document intake checklist** | `hia intake` | The exact documents to gather for your situation and plan type, why each matters, and how to request it. |

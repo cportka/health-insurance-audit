@@ -41,6 +41,23 @@ test("unknown type throws with the available list", () => {
   assert.throws(() => generateLetter({ type: "nope" }), /Unknown letter type/);
 });
 
+test("continuation-of-benefits letter is time-critical and requests unchanged benefits", () => {
+  const r = generateLetter({ type: "continuation-of-benefits", context: {} });
+  assert.match(r.body, /continue|continuation/i);
+  assert.match(r.howToSend, /10 days|IMMEDIATELY|time-critical/i);
+});
+
+test("records-request cites the HIPAA right of access and 30-day clock", () => {
+  const r = generateLetter({ type: "records-request", context: {} });
+  assert.match(r.body, /164\.524|HIPAA/);
+  assert.match(r.body, /30 days/);
+});
+
+test("spd-request cites the ERISA penalty", () => {
+  const r = generateLetter({ type: "spd-request", context: {} });
+  assert.match(r.body, /\$110 per day|ERISA/);
+});
+
 test("every letter carries a disclaimer and attachments", () => {
   for (const { id } of listLetterTypes()) {
     const r = generateLetter({ type: id, context: {} });

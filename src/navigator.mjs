@@ -7,16 +7,27 @@
 // dates yet) and recomputed as the patient advances.
 import { getPlanType } from "./planTypes.mjs";
 import { PATHWAYS } from "./data/pathways.mjs";
+import { statsForFramework } from "./data/outcomeStats.mjs";
 import { parseDate, formatDate, addDuration, daysBetween, durationLabel } from "./dates.mjs";
 import { withDisclaimer } from "./disclaimer.mjs";
+
+export const DENIAL_TYPES = [
+  "pre-service", // a service you need approved before getting it
+  "post-service", // payment for care already received
+  "payment", // an explicit payment/reimbursement claim (Medicare: longer clock than service)
+  "urgent", // waiting could seriously jeopardize your health (expedited)
+  "termination", // an approved service is being stopped/reduced (triggers continuation-of-benefits)
+  "drug", // a prescription-drug coverage/exception decision
+  "grievance", // a complaint about service/quality (not a coverage denial)
+];
 
 /**
  * @param {object} args
  *   planTypeId   {string}  e.g. "aca-individual"
- *   denialType   {string}  "pre-service" | "post-service" | "urgent" | "drug" | "grievance"
+ *   denialType   {string}  one of DENIAL_TYPES
  *   denialDate   {string}  YYYY-MM-DD on the denial notice (optional but recommended)
  *   today        {string}  YYYY-MM-DD override for testing (defaults to system date)
- * @returns {object} { planType, framework, denialType, steps, nextAction, warnings, _disclaimer }
+ * @returns {object} { planType, framework, denialType, outcomeOdds, steps, nextAction, warnings, _disclaimer }
  */
 export function buildPathway({ planTypeId, denialType = "post-service", denialDate, today } = {}) {
   const plan = getPlanType(planTypeId);
@@ -34,6 +45,16 @@ export function buildPathway({ planTypeId, denialType = "post-service", denialDa
     warnings.push(
       `${plan.name} plans may not have the standardized federal appeal protections — confirm your ` +
         `exact rights and deadlines in your policy and with ${plan.regulator}.`,
+    );
+  }
+  // Termination/reduction of an already-approved service triggers continuation-of-benefits rights —
+  // the most time-critical, easily-missed window in the whole system.
+  if (denialType === "termination") {
+    warnings.push(
+      "Your care is being stopped or reduced. You may be able to KEEP your current benefits during " +
+        "the appeal — but you usually must request it FAST (Medicaid: within ~10 days of the notice or " +
+        "before the change takes effect; Medicare: by the deadline on the notice). Ask for continuation " +
+        "of benefits when you appeal.",
     );
   }
 
@@ -81,6 +102,7 @@ export function buildPathway({ planTypeId, denialType = "post-service", denialDa
     planType: { id: plan.id, name: plan.name, regulator: plan.regulator, funding: plan.funding },
     framework: { id: pathway.id, name: pathway.name, appliesTo: pathway.appliesTo || null },
     denialType,
+    outcomeOdds: statsForFramework(plan.framework),
     grievanceNote: pathway.grievanceNote || null,
     steps,
     nextAction: firstActionable
@@ -95,12 +117,16 @@ export function buildPathway({ planTypeId, denialType = "post-service", denialDa
 }
 
 // Choose the right decision clock for a step given the denial type. Steps may define a single
-// `decisionWithin` (duration) or a map keyed by pre-service/post-service/urgent/standard/expedited.
+// `decisionWithin` (duration) or a map keyed by preService/postService/payment/urgent/standard/
+// expedited. Medicare draws a real service-vs-payment distinction (e.g. Part D: 7 days service /
+// 14 days payment), so `payment` is its own branch rather than collapsing into `standard`.
 function pickDecisionClock(step, denialType) {
   const dw = step.decisionWithin;
   if (!dw) return null;
   if (typeof dw.amount === "number") return dw; // single duration
-  if (denialType === "urgent") return dw.urgent || dw.expedited || dw.preService || dw.standard || null;
+  if (denialType === "urgent" || denialType === "termination")
+    return dw.urgent || dw.expedited || dw.preService || dw.standard || null;
+  if (denialType === "payment") return dw.payment || dw.postService || dw.standard || null;
   if (denialType === "pre-service") return dw.preService || dw.standard || null;
   if (denialType === "drug") return dw.standard || dw.preService || null;
   return dw.postService || dw.standard || null;

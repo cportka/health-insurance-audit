@@ -97,7 +97,7 @@ Usage:
   hia version                                Print version
   hia help                                   This help
 
-Denial types: pre-service, post-service, urgent, drug, grievance
+Denial types: pre-service, post-service, payment, urgent, termination, drug, grievance
 Add --json to most commands for machine-readable output.
 
 General information, not legal/medical advice.`;
@@ -141,6 +141,7 @@ switch (cmd) {
     const lines = [];
     lines.push(`Appeal pathway for: ${result.planType.name}`);
     lines.push(`Regulator: ${result.planType.regulator}`);
+    if (result.outcomeOdds) lines.push(`\n💪 ${result.outcomeOdds.headline}\n   ${result.outcomeOdds.detail}`);
     if (result.nextAction) lines.push(`\n➡ Next: ${result.nextAction.step} — file by ${result.nextAction.fileBy} (decided by ${result.nextAction.decidedBy})`);
     lines.push("");
     for (const s of result.steps) {

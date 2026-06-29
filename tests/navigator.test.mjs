@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildPathway } from "../src/navigator.mjs";
+import { buildPathway, DENIAL_TYPES } from "../src/navigator.mjs";
 import { PATHWAYS } from "../src/data/pathways.mjs";
+import { statsForFramework, GENERAL_STATS } from "../src/data/outcomeStats.mjs";
 
 test("ACA post-service pathway computes the 180-day internal deadline", () => {
   const r = buildPathway({
@@ -65,4 +66,33 @@ test("every step in every framework has an authority citation", () => {
 test("result carries the disclaimer", () => {
   const r = buildPathway({ planTypeId: "aca-individual" });
   assert.match(r._disclaimer, /not.*advice/i);
+});
+
+test("navigator surfaces plan-specific outcome odds with sources", () => {
+  const ma = buildPathway({ planTypeId: "medicare-advantage" });
+  assert.ok(ma.outcomeOdds.headline);
+  assert.match(ma.outcomeOdds.detail, /75%/); // OIG MA prior-auth overturn
+  assert.ok(ma.outcomeOdds.sources.length > 0);
+  const aca = buildPathway({ planTypeId: "aca-individual" });
+  assert.match(aca.outcomeOdds.detail, /1%|appeal/i);
+});
+
+test("statsForFramework falls back to a general nudge", () => {
+  assert.equal(statsForFramework("does-not-exist"), GENERAL_STATS);
+});
+
+test("termination denial warns about continuation of benefits", () => {
+  const r = buildPathway({ planTypeId: "medicaid-managed-care", denialType: "termination" });
+  assert.ok(r.warnings.some((w) => /continuation of benefits|keep your current benefits/i.test(w)));
+});
+
+test("payment denial selects the Part D 14-day payment clock", () => {
+  const r = buildPathway({ planTypeId: "medicare-part-d", denialType: "payment" });
+  const redetermination = r.steps.find((s) => s.key === "redetermination");
+  assert.match(redetermination.decisionWithin, /14 days/);
+});
+
+test("DENIAL_TYPES includes payment and termination", () => {
+  assert.ok(DENIAL_TYPES.includes("payment"));
+  assert.ok(DENIAL_TYPES.includes("termination"));
 });

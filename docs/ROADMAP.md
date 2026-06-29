@@ -2,22 +2,28 @@
 
 The product ships in **gates**. Each gate is a usable release you (Chris) **test and throw back** —
 the gate isn't "done" until it passes its checkpoint with a real person who is not an insurance
-expert. Versions follow [SemVer](https://semver.org): each gate is a **MINOR** bump pre-1.0; bug
-fixes within a gate are **PATCH** bumps. **1.0.0** is the north star: *fully automated, and easy for
-someone who knows nothing about health insurance or their rights.*
+expert. Versions follow [SemVer](https://semver.org) **strictly**, so a gate is a *milestone theme*,
+not a fixed version number — a single gate may span several MINOR releases (Gate 0 already covers
+`0.1.0` and `0.2.0`). New backward-compatible features bump MINOR; fixes bump PATCH. **1.0.0** is the
+north star: *fully automated, and easy for someone who knows nothing about health insurance or their
+rights.* The running backlog of what's left lives in [IMPROVEMENTS.md](./IMPROVEMENTS.md).
 
 Legend: ✅ shipped · 🔜 next · ⏳ planned. Each gate lists **Deliverables**, the **Test & throw**
 checkpoint (how you'll evaluate it), **Exit criteria**, and **Decisions** you'll want to weigh in on.
 
 ---
 
-## Gate 0 — Core engine & knowledge base ✅ `0.1.0`
+## Gate 0 — Core engine & knowledge base ✅ `0.1.0` → `0.2.0`
 
 The offline brain: correct, cited rules for all major plan types, exposed via a CLI and a library.
 
-- **Deliverables:** plan-type registry; Deadline & Pathway Navigator; Appeal & Grievance letter
-  generator; Bill & EOB audit rules engine; Document intake checklists; `hia` CLI; tests + CI;
-  planning docs. Zero dependencies, fully offline.
+- **Deliverables:** plan-type registry; Deadline & Pathway Navigator (with per-plan-type **overturn
+  odds** surfaced at the moment of denial); Appeal & Grievance letter generator; Bill & EOB audit
+  rules engine; Document intake checklists; `hia` CLI; tests + CI; planning docs. Deadlines verified
+  against primary sources with an adversarial pass. Zero dependencies, fully offline.
+- **`0.2.0` hardening:** outcome odds; `termination`/`payment` denial types + continuation-of-benefits;
+  three document-demand letters; verified deadline corrections (see CHANGELOG). Remaining Gate-0
+  follow-ups (fast-track pathways, state overlays, deeper EOB checks) are tracked in IMPROVEMENTS.md.
 - **Test & throw:** run `hia navigate / intake / audit / letter` for a few real scenarios; check that
   deadlines, letters, and audit findings are correct and understandable. Throw back anything that's
   wrong, jargony, or missing.

@@ -334,4 +334,100 @@ export const TEMPLATES = {
       };
     },
   },
+
+  "continuation-of-benefits": {
+    label: "Request to keep your benefits during the appeal (continuation of benefits)",
+    build(ctx) {
+      const body =
+        header(ctx) +
+        [
+          "To Whom It May Concern:",
+          "",
+          `My current ${field(ctx, "serviceDescription", "service/treatment/medication")} is being ` +
+            `stopped or reduced. I am appealing that decision, and I am requesting that my benefits ` +
+            `CONTINUE UNCHANGED while my appeal (and any fair hearing) is pending.`,
+          "",
+          `Please treat this as a timely request for continuation of benefits. I am submitting it as ` +
+            `quickly as possible and before the change is scheduled to take effect.`,
+          "",
+          "Sincerely,",
+          "",
+          `${field(ctx, "memberName", "YOUR FULL NAME")}`,
+        ].join("\n");
+      return {
+        subject: `Request for continuation of benefits during appeal — Member #${field(ctx, "memberId", "MEMBER ID")}`,
+        body,
+        attachments: ["Copy of the notice stopping or reducing your service", ...ATTACH_COMMON],
+        howToSend:
+          "Send IMMEDIATELY — this is time-critical. Medicaid: request within ~10 days of the notice " +
+          "or before the change takes effect. Medicare: by the deadline on your notice. Keep proof of " +
+          "the date you sent it.",
+      };
+    },
+  },
+
+  "records-request": {
+    label: "Request your medical records (HIPAA right of access)",
+    build(ctx) {
+      const body =
+        header(ctx) +
+        [
+          "To the Medical Records / Health Information Department:",
+          "",
+          `Under my HIPAA right of access (45 CFR 164.524), I am requesting a copy of my medical ` +
+            `records for the following: ${field(ctx, "recordsScope", "DATES OF SERVICE / PROVIDERS / CONDITIONS")}.`,
+          "",
+          `Please include chart notes, test and imaging results, and any documentation supporting the ` +
+            `medical necessity of the care in question. I would like the records sent to me ` +
+            `${field(ctx, "deliveryMethod", "by secure electronic copy or mail")}.`,
+          "",
+          `I understand you must provide these within 30 days. Please let me know of any reasonable, ` +
+            `cost-based copying fee in advance.`,
+          "",
+          "Sincerely,",
+          "",
+          `${field(ctx, "memberName", "YOUR FULL NAME")}`,
+        ].join("\n");
+      return {
+        subject: `Medical records request (HIPAA right of access) — ${field(ctx, "patientName", "PATIENT NAME")}`,
+        body,
+        attachments: ["A copy of your photo ID, if the provider requires it to verify identity"],
+        howToSend:
+          "Send to each provider's medical records department. They must respond within 30 days under " +
+          "HIPAA (45 CFR 164.524).",
+      };
+    },
+  },
+
+  "spd-request": {
+    label: "Demand your plan documents (ERISA SPD request)",
+    build(ctx) {
+      const body =
+        header(ctx) +
+        [
+          "To the Plan Administrator:",
+          "",
+          `As a participant in this employee benefit plan, I am requesting copies of the following ` +
+            `plan documents: the Summary Plan Description (SPD), the full plan document, and the ` +
+            `summary of benefits and coverage.`,
+          "",
+          `Under ERISA, the plan administrator must furnish these within 30 days of a written request ` +
+            `and may be liable for a penalty of up to $110 per day for failing to do so.`,
+          "",
+          `I need these documents to understand my benefits and to prepare an appeal.`,
+          "",
+          "Sincerely,",
+          "",
+          `${field(ctx, "memberName", "YOUR FULL NAME")}`,
+        ].join("\n");
+      return {
+        subject: `Request for plan documents (SPD) — Member #${field(ctx, "memberId", "MEMBER ID")}`,
+        body,
+        attachments: [],
+        howToSend:
+          "Send to your plan administrator (often via HR for a job-based plan). Keep proof of the date — " +
+          "the 30-day clock and the daily penalty run from your written request (ERISA § 104(b)(4) / 29 U.S.C. 1024).",
+      };
+    },
+  },
 };
