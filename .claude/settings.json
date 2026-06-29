@@ -1,0 +1,9 @@
+{
+  "extraKnownMarketplaces": {
+    "portka-tools": { "source": { "source": "github", "repo": "cportka/claude-plugins" } }
+  },
+  "enabledPlugins": {
+    "repo-bootstrap@portka-tools": true,
+    "app-website-evaluator@portka-tools": true
+  }
+}
