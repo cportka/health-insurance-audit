@@ -16,6 +16,8 @@ export {
 export { buildPathway, DENIAL_TYPES } from "./navigator.mjs";
 export { PATHWAYS } from "./data/pathways.mjs";
 
+export { buildActionPlan, INTENTS } from "./actionPlan.mjs";
+
 export { generateLetter, listLetterTypes } from "./letters.mjs";
 
 export { auditClaim } from "./eobAudit.mjs";

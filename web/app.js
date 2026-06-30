@@ -11,6 +11,8 @@ import {
   auditClaim,
   listScenarios,
   buildChecklist,
+  buildActionPlan,
+  INTENTS,
   DISCLAIMER,
 } from "../src/index.mjs";
 
@@ -40,10 +42,8 @@ const DENIAL_LABELS = {
   grievance: "A complaint about service or quality of care",
 };
 
-// ---------- init ----------
-function init() {
-  // plan picker (grouped by category)
-  const sel = $("#plan-select");
+// Populate a <select> with plan types grouped by category.
+function populatePlanSelect(sel) {
   const cats = { commercial: "Job-based & individual", medicare: "Medicare", medicaid: "Medicaid / CHIP", government: "Government (FEHB / TRICARE)" };
   const byCat = {};
   for (const p of allPlanTypes()) (byCat[p.category] ||= []).push(p);
@@ -58,6 +58,23 @@ function init() {
       og.appendChild(o);
     }
     sel.appendChild(og);
+  }
+}
+
+// ---------- init ----------
+function init() {
+  populatePlanSelect($("#plan-select"));
+  populatePlanSelect($("#home-plan"));
+
+  // intent cards (the consumer entry point)
+  const ic = $("#intent-cards");
+  for (const intent of INTENTS) {
+    const b = document.createElement("button");
+    b.className = "intent-card";
+    b.dataset.intent = intent.id;
+    b.innerHTML = `<span class="intent-emoji">${intent.id === "overturn-denial" ? "🛡️" : "⚖️"}</span><span class="intent-text">${esc(intent.label)}</span>`;
+    b.addEventListener("click", () => chooseIntent(intent));
+    ic.appendChild(b);
   }
 
   // denial types
@@ -94,6 +111,10 @@ function init() {
   wireTabs();
   $("#plan-select").addEventListener("change", onPlanChange);
   $("#plan-guess-btn").addEventListener("click", onGuess);
+  // home (intent-first) wiring
+  $("#home-plan").addEventListener("change", (e) => { state.planTypeId = e.target.value; });
+  $("#home-guess-btn").addEventListener("click", onHomeGuess);
+  $("#build-plan-btn").addEventListener("click", onBuildPlan);
   $("#navigate-btn").addEventListener("click", onNavigate);
   $("#add-line").addEventListener("click", () => addLineRow());
   $("#audit-example").addEventListener("click", loadExample);
@@ -114,6 +135,121 @@ function showTab(name) {
   $$(".panel").forEach((p) => (p.hidden = p.id !== `panel-${name}`));
   if (name === "deadlines" || name === "documents") refreshPlanLabels();
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ---------- home (intent-first) ----------
+let chosenIntent = null;
+function chooseIntent(intent) {
+  chosenIntent = intent;
+  $$(".intent-card").forEach((c) => c.classList.toggle("selected", c.dataset.intent === intent.id));
+  $("#intent-chosen").textContent = intent.label;
+  $("#intent-form").hidden = false;
+  if (state.planTypeId) $("#home-plan").value = state.planTypeId;
+  $("#intent-form").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function onHomeGuess() {
+  const box = $("#home-guess-results");
+  const guesses = guessPlanType($("#home-plan-guess").value).slice(0, 4);
+  box.innerHTML = "";
+  if (!guesses.length) {
+    box.innerHTML = `<span class="empty-hint">No confident guess — pick from the list above.</span>`;
+    return;
+  }
+  for (const g of guesses) {
+    const b = document.createElement("button");
+    b.className = "btn";
+    b.textContent = g.name;
+    b.addEventListener("click", () => {
+      $("#home-plan").value = g.id;
+      state.planTypeId = g.id;
+    });
+    box.appendChild(b);
+  }
+}
+function urgencyPill(a) {
+  if (a.urgency === "now") return `<span class="pill urgent">Do now</span>`;
+  if (a.urgency === "deadline")
+    return `<span class="pill overdue">${a.deadlineDate ? `By ${esc(a.deadlineDate)}` : "Deadline"}</span>`;
+  if (a.urgency === "soon") return `<span class="pill ok">Soon</span>`;
+  return `<span class="pill">Ongoing</span>`;
+}
+function renderLetterBlock(letter) {
+  // returns HTML; the <pre> body is filled via textContent after insertion (see fillLetterBodies)
+  const ph = letter.placeholders.length
+    ? `<div class="placeholders"><strong>Fill in:</strong> ${esc(letter.placeholders.join(", "))}</div>`
+    : "";
+  return `<div class="letter-output">
+      <p><strong>Subject:</strong> ${esc(letter.subject)}</p>
+      <pre class="letter-body" data-body="${esc(letter.body)}"></pre>
+    </div>
+    <button class="btn copy-letter" data-body="${esc(letter.body)}">Copy letter</button>
+    ${ph}
+    <h4>Attach</h4><ul class="attach">${letter.attachments.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>
+    <h4>How to send</h4><p>${esc(letter.howToSend)}</p>`;
+}
+function fillLetterBodies(root) {
+  $$(".letter-body", root).forEach((pre) => (pre.textContent = pre.dataset.body));
+  $$(".copy-letter", root).forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.body);
+        btn.textContent = "Copied ✓";
+      } catch {
+        btn.textContent = "Select the letter text to copy";
+      }
+    }),
+  );
+}
+function onBuildPlan() {
+  const box = $("#plan-results");
+  if (!chosenIntent) return;
+  const planTypeId = $("#home-plan").value;
+  if (!planTypeId) {
+    box.innerHTML = `<p class="warn-item">⚠ Please choose your plan type above (or use "Not sure?").</p>`;
+    return;
+  }
+  state.planTypeId = planTypeId;
+  let plan;
+  try {
+    plan = buildActionPlan({
+      intent: chosenIntent.id,
+      planTypeId,
+      denialDate: $("#home-date").value || undefined,
+      hasBill: $("#home-bill").checked,
+    });
+  } catch (e) {
+    box.innerHTML = `<p class="warn-item">⚠ ${esc(e.message)}</p>`;
+    return;
+  }
+  const hero = plan.nextStep
+    ? `<div class="hero">
+         <div class="hero-label">✅ Your next step</div>
+         <div class="hero-step">${esc(plan.nextStep.title)}</div>
+         <div class="hero-deadline">${esc(plan.nextStep.deadlineText || plan.nextStep.why)}</div>
+       </div>`
+    : "";
+  const odds = plan.outcomeOdds
+    ? `<div class="odds"><strong>💪 ${esc(plan.outcomeOdds.headline)}</strong>${more("Why it's worth it", `<p>${esc(plan.outcomeOdds.detail)}</p>${srcLinks(plan.outcomeOdds.sources)}`)}</div>`
+    : "";
+  const actions = plan.actions
+    .map((a, i) => {
+      let detail = "";
+      if (a.do) detail += `<p style="white-space:pre-line">${esc(a.do)}</p>`;
+      if (a.documents)
+        detail += `<ul>${a.documents.map((d) => `<li><strong>${esc(d.name)}</strong> — <span class="muted">${esc(d.howToGet)}</span></li>`).join("")}</ul>`;
+      if (a.letter) detail += renderLetterBlock(a.letter);
+      detail += srcLinks(a.sources);
+      const label = a.letter ? "Open the drafted letter & details" : a.documents ? "See the documents" : "More details";
+      return `<div class="action-card">
+          <div class="action-head"><span class="action-num">${i + 1}</span><span class="action-title">${esc(a.title)}</span>${urgencyPill(a)}</div>
+          <p class="action-why">${esc(a.why)}</p>
+          ${more(label, detail)}
+        </div>`;
+    })
+    .join("");
+  box.innerHTML = `<div class="plan-summary"><h3>${esc(plan.title)}</h3><p>${esc(plan.summary)}</p></div>${hero}${odds}<div class="steps-title">Your full plan</div>${actions}`;
+  fillLetterBodies(box);
+  box.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // ---------- start / plan ----------

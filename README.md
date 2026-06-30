@@ -4,7 +4,7 @@ A free, offline-first tool that helps patients in the USA **audit their health i
 **right appeal/grievance pathway and deadlines**, generate **appeal & grievance letters**, and know
 **exactly which documents to gather** — across all major US plan types.
 
-> **Version:** 0.3.1 · **Try it:** [cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/) · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
+> **Version:** 0.4.0 · **Try it:** [cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/) · **License:** [MIT](./LICENSE) · **Changelog:** [CHANGELOG.md](./CHANGELOG.md) · **Roadmap:** [docs/ROADMAP.md](./docs/ROADMAP.md)
 
 > ⚠️ **This is general information, not legal or medical advice.** Deadlines and rights vary by plan,
 > state, and situation. Always confirm the deadline on your own denial notice and with your plan or
@@ -43,11 +43,15 @@ warning when a plan type has **weaker appeal rights**.
 
 ## Use it in your browser (no install)
 
-A static web app lives at **[cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/)**
-— pick your plan, see your deadlines and overturn odds, audit a bill, draft a letter, and get your
-document checklist. It runs **100% in your browser** (it imports this same library as ES modules), so
-**nothing you type is uploaded**. To run it locally, serve the repo root with any static server
-(`python3 -m http.server`) and open `index.html`.
+A static web app lives at **[cportka.github.io/health-insurance-audit](https://cportka.github.io/health-insurance-audit/)**.
+The **"Start here"** tab is the intent-first experience: tell it your goal (*"I got a denial and want
+to overturn it"* or *"my insurance keeps underpaying — I want to file a grievance"*), answer a question
+or two, and it builds your whole plan with the one next step up front and your letters drafted. The
+other tabs are the **engine console** — each piece (deadlines, audit, letters, documents) on its own,
+for developing the logic. It runs **100% in your browser** (it imports this same library as ES
+modules), so **nothing you type is uploaded**. To run it locally, serve the repo root with any static
+server (`python3 -m http.server`) and open `index.html`. See [docs/VISION.md](./docs/VISION.md) for the
+product direction.
 
 ## Quick start (CLI)
 
