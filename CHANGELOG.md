@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com) and the project uses
 [Semantic Versioning](https://semver.org).
 
+## [0.4.0] — 2026-06-29
+
+Intent-first pivot: the patient states a goal, and the tool assembles the whole plan.
+
+### Added
+- **`buildActionPlan({ intent })` — the brain** (`src/actionPlan.mjs`). Given a plain-language goal,
+  it assembles *everything a patient can do* into one ordered plan: the controlling deadline, drafted
+  letters, the document list, escalation to the right regulator, and free human help — built from the
+  existing engines. Two intents to start: **overturn-denial** and **grievance-underpayment**. Returns
+  a single `nextStep`, outcome odds, and prioritized `actions` (now → deadline → soon → ongoing).
+- **Intent-first "Start here" home** in the web app: pick a goal, answer one or two questions (plan,
+  and optionally a date), and get the assembled plan — one next step up front, the rest behind
+  progressive disclosure with the letters drafted inline. The detailed tabs are repositioned as the
+  **engine console** for developing the logic.
+- `docs/VISION.md` — the intent-first, concierge-simple product direction and what it means for the
+  architecture (the action plan is the brain; the consumer UI is a thin shell over it).
+- `INTENTS` added to the public API.
+
+### Notes
+- Re-verified end to end in a headless browser: the intent flow and all engine-console tabs work with
+  no console errors. 66 tests pass (was 58).
+
 ## [0.3.1] — 2026-06-29
 
 UX: lead with one thing, hide the rest (progressive disclosure — "Apple-like" simplicity).

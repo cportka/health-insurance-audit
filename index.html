@@ -37,16 +37,50 @@
     </div>
 
     <nav class="tabs wrap" role="tablist" aria-label="Sections">
-      <button role="tab" class="tab" data-tab="start" aria-selected="true">1 · Start</button>
-      <button role="tab" class="tab" data-tab="deadlines" aria-selected="false">2 · Deadlines</button>
-      <button role="tab" class="tab" data-tab="audit" aria-selected="false">3 · Audit a bill</button>
-      <button role="tab" class="tab" data-tab="letters" aria-selected="false">4 · Letters</button>
-      <button role="tab" class="tab" data-tab="documents" aria-selected="false">5 · Documents</button>
+      <button role="tab" class="tab" data-tab="home" aria-selected="true">★ Start here</button>
+      <button role="tab" class="tab" data-tab="start" aria-selected="false">Plan</button>
+      <button role="tab" class="tab" data-tab="deadlines" aria-selected="false">Deadlines</button>
+      <button role="tab" class="tab" data-tab="audit" aria-selected="false">Audit a bill</button>
+      <button role="tab" class="tab" data-tab="letters" aria-selected="false">Letters</button>
+      <button role="tab" class="tab" data-tab="documents" aria-selected="false">Documents</button>
     </nav>
 
     <main id="main" class="wrap">
-      <!-- START -->
-      <section id="panel-start" class="panel" role="tabpanel" aria-label="Start">
+      <!-- HOME — intent-first entry point (the consumer experience). -->
+      <section id="panel-home" class="panel" role="tabpanel" aria-label="Start here">
+        <h2>What do you want to do?</h2>
+        <p class="muted">Pick your goal — we'll build your whole plan and tell you the one thing to do next.</p>
+        <div class="intent-cards" id="intent-cards"></div>
+
+        <div id="intent-form" hidden>
+          <h3 id="intent-chosen"></h3>
+          <p class="muted">Just one or two quick questions:</p>
+          <label class="field">
+            <span>Which kind of plan do you have?</span>
+            <select id="home-plan"><option value="">— choose —</option></select>
+          </label>
+          <details class="not-sure">
+            <summary>Not sure what you have?</summary>
+            <label class="field">
+              <span>Describe your coverage in your own words</span>
+              <input id="home-plan-guess" type="text" placeholder="e.g. through my job, a big company that pays the claims itself" />
+            </label>
+            <button id="home-guess-btn" class="btn">Guess my plan type</button>
+            <div id="home-guess-results" class="guess-results"></div>
+          </details>
+          <div class="row">
+            <label class="field"><span>Date on your denial/notice <span class="muted">(if you have it)</span></span><input id="home-date" type="date" /></label>
+            <label class="field inline checkbox" style="align-self:end"><input type="checkbox" id="home-bill" /> <span>There's a bill involved</span></label>
+          </div>
+          <button id="build-plan-btn" class="btn primary">Build my plan</button>
+        </div>
+
+        <div id="plan-results" class="results"></div>
+        <p class="muted engine-note">Building the tool? The other tabs are the <strong>engine console</strong> — each piece on its own.</p>
+      </section>
+
+      <!-- START (engine console: plan picker) -->
+      <section id="panel-start" class="panel" role="tabpanel" aria-label="Plan" hidden>
         <h2>What kind of health plan do you have?</h2>
         <p class="muted">
           This decides who you appeal to and how long you have. If you're not sure, describe it below
